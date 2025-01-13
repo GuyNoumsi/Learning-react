@@ -1,3 +1,15 @@
 body { 
-  padding: 5px;
+  padding: 20px;
+}
+
+table{
+  margin-top: 10px;
+  border-collapse: collapse; 
+  width: 100%;
+  border:1px solid black;
+}
+.my-table th,
+.my-table td {
+  border: 1px solid black;
+  padding: 10px;
 }
