@@ -1,11 +1,12 @@
-import Button from "./Button";
+import Button from "../components/Button";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
-import { DataTable } from "./DataTable";
+import { ChangeEvent, useState } from "react";
+import { ExpenseDataTable } from "./Components/ExpenseDataTable";
 
 export const categories = [" ", "Groceries", "utilities", "Entertainment"] as const;
+export const filters = ["All categories","Groceries", "utilities", "Entertainment"]
 
 const schema = z.object({
     description: z.string().min(3, {message: "Description should be atleast 3 characters."}),
@@ -15,21 +16,30 @@ const schema = z.object({
 
 export type FormInfos = z.infer<typeof schema>
 
-export const Form = () => {
-    const [dataList, setDataList] = useState<FormInfos[]>([]);  
-    //const dataList: FormData[] = [];
+export interface ExpenseData {
+    id: number,
+    data: FormInfos
+}
+
+export const ExpenseForm = () => {
+    const [dataList, setDataList] = useState<ExpenseData[]>([]);  
+    const [filter, setFilter] = useState(filters[0]);
     const {
-        register, handleSubmit,
+        register, handleSubmit, reset,
         formState: { errors },
     } = useForm<FormInfos>({resolver: zodResolver(schema)})
 
     const onSubmit = (data : FormInfos) =>{
-        const item : FormInfos = {description: data.description, amount: data.amount, category: data.category }
+        const item : ExpenseData = {id: dataList.length + 1, data: data }
         setDataList([...dataList, item])
-        console.log(dataList);
+        reset();
+        console.log("form reset")
     }
     const onDelete = (itemIndex: number) =>{
-        setDataList(dataList.filter((_, index) => index != itemIndex));
+        setDataList(dataList.filter((item) => item.id != itemIndex));
+    }
+    const onFilterChanged = (event: ChangeEvent<HTMLSelectElement>) =>{
+        setFilter(event.target.value);
     }
 
     return (
@@ -69,8 +79,18 @@ export const Form = () => {
                   
               <Button type="submit" onClick = {() => console.log("form submitted")} >Submit</Button>
             </form>
+            <select id = "filter" style={{marginTop:'10px', display:'flex', width:'100%'}}  value = {filter} 
+                onChange={onFilterChanged}>
+                      {
+                          filters.map((item) => (
+                              <option key = {item} value={item}>
+                                  {item}
+                              </option>
+                          ))
+                      }
+              </select>
                   
-           <DataTable dataList={dataList} onDelete={onDelete}></DataTable>
+           <ExpenseDataTable dataList={dataList} onDelete={onDelete} filter={filter}></ExpenseDataTable>
       </>
     )
 }

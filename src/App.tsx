@@ -1,9 +1,9 @@
 import './App.css'
-import { Form } from './components/Form';
+import { ExpenseForm } from './ExpenseTracker/ExpenseForm';
 
 function App() {
   return (
-    <Form/>
+    <ExpenseForm/>
   );
 }
 
